@@ -1,0 +1,73 @@
+# Towers of Hanoi as Search Problem (AI)
+
+from copy import deepcopy
+
+class HanoiSearch:
+
+    def __init__(self, n):
+        self.start = [list(range(1, n+1)), [], []]
+        self.goal = [[], [], list(range(1, n+1))]
+        self.visited = set()
+
+    # convert state to hashable form
+    def state_key(self, state):
+        return tuple(tuple(peg) for peg in state)
+
+    # check goal
+    def goal_test(self, state):
+        return state == self.goal
+
+    # generate valid moves
+    def successors(self, state):
+        moves = []
+
+        for i in range(3):
+            if not state[i]:
+                continue
+
+            disk = state[i][0]
+
+            for j in range(3):
+                if i == j:
+                    continue
+
+                if not state[j] or disk < state[j][0]:
+                    new_state = deepcopy(state)
+                    new_state[j].insert(0, new_state[i].pop(0))
+                    moves.append((new_state, f"{i} → {j}"))
+
+        return moves
+
+    # Breadth First Search
+    def bfs(self):
+        queue = [(self.start, [])]
+        self.visited.add(self.state_key(self.start))
+
+        while queue:
+            state, path = queue.pop(0)
+
+            if self.goal_test(state):
+                return path
+
+            for new_state, action in self.successors(state):
+                key = self.state_key(new_state)
+
+                if key not in self.visited:
+                    self.visited.add(key)
+                    queue.append((new_state, path + [action]))
+
+        return None
+
+
+# Run Program
+if __name__ == "__main__":
+    n = 3
+    problem = HanoiSearch(n)
+
+    solution = problem.bfs()
+
+    print("Solution Steps:")
+    for step, move in enumerate(solution, 1):
+        print(f"Step {step}: Move {move}")
+
+    print("\nTotal moves:", len(solution))
