@@ -1,0 +1,59 @@
+LOC_A = "A"
+LOC_B = "B"
+
+# Room states
+DIRTY = "Dirty"
+CLEAN = "Clean"
+
+
+class VacuumEnvironment:
+    def __init__(self):
+        # Initial environment state
+        self.rooms = {
+            LOC_A: DIRTY,
+            LOC_B: DIRTY
+        }
+
+
+class ReflexVacuumAgent:
+    def __init__(self, location):
+        self.location = location
+
+    # Reflex rule (Condition → Action)
+    def perceive_and_act(self, environment):
+        status = environment.rooms[self.location]
+
+        if status == DIRTY:
+            action = "SUCK"
+            environment.rooms[self.location] = CLEAN
+
+        elif self.location == LOC_A:
+            action = "RIGHT"
+            self.location = LOC_B
+
+        else:
+            action = "LEFT"
+            self.location = LOC_A
+
+        return action
+
+
+# Simulation
+def run_simulation():
+    env = VacuumEnvironment()
+    agent = ReflexVacuumAgent(LOC_A)
+
+    print("Initial State:", env.rooms)
+    print("--------------------------------")
+
+    for step in range(6):
+        action = agent.perceive_and_act(env)
+        print(f"Step {step+1}:")
+        print(" Location:", agent.location)
+        print(" Action:", action)
+        print(" Environment:", env.rooms)
+        print("--------------------------------")
+
+
+if __name__ == "__main__":
+    run_simulation()
